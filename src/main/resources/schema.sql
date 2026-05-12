@@ -31,3 +31,16 @@ VALUES (
     'ACTIVE'
 );
 
+CREATE TABLE IF NOT EXISTS employees (
+    id              VARCHAR(36)    NOT NULL PRIMARY KEY,
+    document_number VARCHAR(20)    NOT NULL UNIQUE,
+    first_name      VARCHAR(100)   NOT NULL,
+    last_name       VARCHAR(100)   NOT NULL,
+    email           VARCHAR(150)   NOT NULL UNIQUE,
+    phone           VARCHAR(20)    NULL,
+    base_salary     DECIMAL(12,2)  NOT NULL,
+    status          ENUM('ACTIVE','INACTIVE','SUSPENDED','TERMINATED') NOT NULL DEFAULT 'ACTIVE',
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
