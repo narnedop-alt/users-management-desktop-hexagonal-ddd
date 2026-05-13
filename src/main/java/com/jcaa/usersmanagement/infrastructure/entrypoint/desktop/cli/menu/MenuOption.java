@@ -14,6 +14,11 @@ public enum MenuOption {
   UPDATE_USER(4, "Update user"),
   DELETE_USER(5, "Delete user"),
   LOGIN(6, "Login"),
+  LIST_EMPLOYEES(7, "List all employees"),
+  FIND_EMPLOYEE(8, "Find employee by ID"),
+  CREATE_EMPLOYEE(9, "Create employee"),
+  UPDATE_EMPLOYEE(10, "Update employee"),
+  DELETE_EMPLOYEE(11, "Delete employee"),
   EXIT(0, "Exit");
 
   private final int number;
