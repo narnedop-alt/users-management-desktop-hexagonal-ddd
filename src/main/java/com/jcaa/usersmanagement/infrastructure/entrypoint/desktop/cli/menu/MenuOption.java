@@ -19,6 +19,11 @@ public enum MenuOption {
   CREATE_EMPLOYEE(9, "Create employee"),
   UPDATE_EMPLOYEE(10, "Update employee"),
   DELETE_EMPLOYEE(11, "Delete employee"),
+  LIST_CONTRACTS(12, "List all contracts"),
+  FIND_CONTRACT(13, "Find contract by ID"),
+  CREATE_CONTRACT(14, "Create contract"),
+  UPDATE_CONTRACT(15, "Update contract"),
+  FINISH_CONTRACT(16, "Finish contract"),
   EXIT(0, "Exit");
 
   private final int number;
