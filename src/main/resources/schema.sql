@@ -44,3 +44,24 @@ CREATE TABLE IF NOT EXISTS employees (
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS contracts (
+    id              VARCHAR(36)    NOT NULL PRIMARY KEY,
+    employee_id     VARCHAR(36)    NOT NULL,
+    contract_number VARCHAR(30)    NOT NULL UNIQUE,
+    position        VARCHAR(100)   NOT NULL,
+    contract_type   ENUM('FIXED_TERM','INDEFINITE','SERVICE','APPRENTICESHIP') NOT NULL,
+    start_date      DATE           NOT NULL,
+    end_date        DATE           NULL,
+    monthly_salary  DECIMAL(12,2)  NOT NULL,
+    status          ENUM('ACTIVE','SUSPENDED','FINISHED','CANCELLED') NOT NULL DEFAULT 'ACTIVE',
+    created_at      DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_contract_employee
+        FOREIGN KEY (employee_id) REFERENCES employees(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    INDEX idx_contract_employee_id (employee_id),
+    INDEX idx_contract_number (contract_number),
+    INDEX idx_contract_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
