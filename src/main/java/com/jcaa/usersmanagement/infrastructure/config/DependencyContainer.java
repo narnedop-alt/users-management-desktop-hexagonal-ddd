@@ -1,34 +1,46 @@
 package com.jcaa.usersmanagement.infrastructure.config;
 
+import com.jcaa.usersmanagement.application.port.in.CreateContractUseCase;
 import com.jcaa.usersmanagement.application.port.in.CreateEmployeeUseCase;
 import com.jcaa.usersmanagement.application.port.in.CreateUserUseCase;
 import com.jcaa.usersmanagement.application.port.in.DeleteEmployeeUseCase;
 import com.jcaa.usersmanagement.application.port.in.DeleteUserUseCase;
+import com.jcaa.usersmanagement.application.port.in.FindContractByIdUseCase;
 import com.jcaa.usersmanagement.application.port.in.FindEmployeeByIdUseCase;
+import com.jcaa.usersmanagement.application.port.in.FinishContractUseCase;
 import com.jcaa.usersmanagement.application.port.in.GetAllUsersUseCase;
 import com.jcaa.usersmanagement.application.port.in.GetUserByIdUseCase;
+import com.jcaa.usersmanagement.application.port.in.ListContractsUseCase;
 import com.jcaa.usersmanagement.application.port.in.ListEmployeesUseCase;
 import com.jcaa.usersmanagement.application.port.in.LoginUseCase;
+import com.jcaa.usersmanagement.application.port.in.UpdateContractUseCase;
 import com.jcaa.usersmanagement.application.port.in.UpdateEmployeeUseCase;
 import com.jcaa.usersmanagement.application.port.in.UpdateUserUseCase;
+import com.jcaa.usersmanagement.application.service.CreateContractService;
 import com.jcaa.usersmanagement.application.service.CreateEmployeeService;
 import com.jcaa.usersmanagement.application.service.CreateUserService;
 import com.jcaa.usersmanagement.application.service.DeleteEmployeeService;
 import com.jcaa.usersmanagement.application.service.DeleteUserService;
 import com.jcaa.usersmanagement.application.service.EmailNotificationService;
+import com.jcaa.usersmanagement.application.service.FindContractByIdService;
 import com.jcaa.usersmanagement.application.service.FindEmployeeByIdService;
+import com.jcaa.usersmanagement.application.service.FinishContractService;
 import com.jcaa.usersmanagement.application.service.GetAllUsersService;
 import com.jcaa.usersmanagement.application.service.GetUserByIdService;
+import com.jcaa.usersmanagement.application.service.ListContractsService;
 import com.jcaa.usersmanagement.application.service.ListEmployeesService;
 import com.jcaa.usersmanagement.application.service.LoginService;
+import com.jcaa.usersmanagement.application.service.UpdateContractService;
 import com.jcaa.usersmanagement.application.service.UpdateEmployeeService;
 import com.jcaa.usersmanagement.application.service.UpdateUserService;
 import com.jcaa.usersmanagement.infrastructure.adapter.email.JavaMailEmailSenderAdapter;
 import com.jcaa.usersmanagement.infrastructure.adapter.email.SmtpConfig;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.config.DatabaseConfig;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.config.DatabaseConnectionFactory;
+import com.jcaa.usersmanagement.infrastructure.adapter.persistence.repository.ContractRepositoryMySQL;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.repository.EmployeeRepositoryMySQL;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.repository.UserRepositoryMySQL;
+import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.ContractController;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.EmployeeController;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.UserController;
 import jakarta.validation.Validator;
@@ -51,6 +63,7 @@ public final class DependencyContainer {
 
   private final UserController userController;
   private final EmployeeController employeeController;
+  private final ContractController contractController;
 
   public DependencyContainer() {
     final AppProperties properties = new AppProperties();
@@ -58,6 +71,7 @@ public final class DependencyContainer {
     final Connection connection = buildDatabaseConnection(properties);
     final UserRepositoryMySQL userRepository = new UserRepositoryMySQL(connection);
     final EmployeeRepositoryMySQL employeeRepository = new EmployeeRepositoryMySQL(connection);
+    final ContractRepositoryMySQL contractRepository = new ContractRepositoryMySQL(connection);
 
     final JavaMailEmailSenderAdapter emailSender =
         new JavaMailEmailSenderAdapter(buildSmtpConfig(properties));
@@ -102,6 +116,27 @@ public final class DependencyContainer {
             deleteEmployeeUseCase,
             findEmployeeByIdUseCase,
             listEmployeesUseCase);
+
+    final CreateContractUseCase createContractUseCase =
+        new CreateContractService(
+            contractRepository, contractRepository, employeeRepository, validator);
+    final FindContractByIdUseCase findContractByIdUseCase =
+        new FindContractByIdService(contractRepository, validator);
+    final ListContractsUseCase listContractsUseCase =
+        new ListContractsService(contractRepository);
+    final UpdateContractUseCase updateContractUseCase =
+        new UpdateContractService(
+            contractRepository, contractRepository, contractRepository, employeeRepository, validator);
+    final FinishContractUseCase finishContractUseCase =
+        new FinishContractService(contractRepository, contractRepository, validator);
+
+    this.contractController =
+        new ContractController(
+            createContractUseCase,
+            updateContractUseCase,
+            finishContractUseCase,
+            findContractByIdUseCase,
+            listContractsUseCase);
   }
 
   public UserController userController() {
@@ -110,6 +145,10 @@ public final class DependencyContainer {
 
   public EmployeeController employeeController() {
     return employeeController;
+  }
+
+  public ContractController contractController() {
+    return contractController;
   }
 
   private static Connection buildDatabaseConnection(final AppProperties properties) {
